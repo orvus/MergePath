@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define NB 4
-#define NTPB 2 //Minimum number of threads in this program has to be 64
+#define NB 2
+#define NTPB 4 //Minimum number of threads in this program has to be 64
 #define sizeTab
 void testCUDA(cudaError_t error, const char *file, int line)  {
    if (error != cudaSuccess) {
@@ -64,12 +64,15 @@ __global__ void mergePath(int* C,int* A,int lenA,int *B,int lenB){
    
    int idx = threadIdx.x + blockIdx.x * blockDim.x+1;
    //C[idx-1] = idx;
-   Ad[idx] = 0;
-   Bd[idx] = 0;
+   // Ad[0] = 0;
+   // Bd[0] = 0;
+
+   Ad[idx-1] = 0;
+   Bd[idx-1] = 0;
    if(idx == 1){
-      // printf("\n");
-      Ad[NB*NTPB] = lenA;
-      Bd[NB*NTPB] = lenB;
+   //    // printf("\n");
+   Ad[NB*NTPB] = lenA;
+   Bd[NB*NTPB] = lenB;
     
    
    }
