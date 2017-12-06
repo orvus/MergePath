@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
-#define NB 2
-#define NTPB 4 //Minimum number of threads in this program has to be 64
+#define NB 8
+#define NTPB 16 //Minimum number of threads in this program has to be 64
 #define sizeTab
 void testCUDA(cudaError_t error, const char *file, int line)  {
    if (error != cudaSuccess) {
@@ -35,7 +36,7 @@ __device__ void printRange(int idx,int* t, int d,int f){
 __device__ void merge(int idx,int* C,int* A, int ab,int ad,int* B, int bb, int bd, int pos,int size){
    int start = ab+bb;
    int i = 0;
-   printf("->%d\n", ad-ab + bd-bb);
+  // printf("->%d\n", ad-ab + bd-bb);
    while(1){
       if(ab >= ad && bb >= bd){
 
@@ -71,8 +72,8 @@ __global__ void mergePath(int* C,int* A,int lenA,int *B,int lenB){
    Bd[idx-1] = 0;
    if(idx == 1){
    //    // printf("\n");
-   Ad[NB*NTPB] = lenA;
-   Bd[NB*NTPB] = lenB;
+      Ad[NB*NTPB] = lenA;
+      Bd[NB*NTPB] = lenB;
     
    
    }
@@ -113,10 +114,10 @@ __global__ void mergePath(int* C,int* A,int lenA,int *B,int lenB){
       }
    }
    __syncthreads();
-      if(idx == 1){
-      printRange(1,Ad,0,9);
-      printRange(1,Bd,0,9);
-   }
+   //    if(idx == 1){
+   //    printRange(1,Ad,0,9);
+   //    printRange(1,Bd,0,9);
+   // }
    int size = (lenA+lenB)/(NB*NTPB);
    for (int i = 1; i <= NB*NTPB; ++i)
    {
@@ -135,22 +136,44 @@ void affiche(int* A,int len){
    }
    puts("\b\b  ");
 }
-#define s 8
+#define s 256
+
+int comp (const void * elem1, const void * elem2) 
+{
+    int f = *((int*)elem1);
+    int s_ = *((int*)elem2);
+    if (f > s_) return  1;
+    if (f < s_) return -1;
+    return 0;
+}
+
 int main(int argc,char** argv){
    /*int A[s] = {5,17,11,19,18,15,16,114,119,120,14,112,117,159
                   ,71,66,58,157,42,195,185,15,176,1124,1419
                   ,120,147,112,1147,19,71,646
                };*/
    // int C[2*s] = {0};
+   srand(time(NULL));
    int* C = (int*)calloc(4*s,sizeof(int));
-   int A[s] = {1,2,3,4,6,10,11,13};
-   int B[s] = {5,7,8,9,12,14,15,16};
+   // int A[s] = {1,2,3,4,6,10,11,13};
+   // int B[s] = {5,7,8,9,12,14,15,16};
+   int *A = (int*)malloc(sizeof(int)*s);
+   int *B = (int*)malloc(sizeof(int)*s);
+
+   for(int i =0 ; i < s ; i++){
+      A[i] = rand()%1000+1;
+      B[i] = rand()%1000+1;
+
+   }
+   qsort(A,s,sizeof(int),comp);
+   qsort(B,s,sizeof(int),comp);
+
    int *aGPU,*bGPU,*cGPU;
    cudaMalloc(&aGPU,s*sizeof(int));
    cudaMemcpy(aGPU,A,s*sizeof(int),cudaMemcpyHostToDevice);
    cudaMalloc(&bGPU,s*sizeof(int));
    cudaMemcpy(bGPU,B,s*sizeof(int),cudaMemcpyHostToDevice);
-   cudaMalloc(&cGPU,4*s*sizeof(int));
+   cudaMalloc(&cGPU,2*s*sizeof(int));
    cudaMemset(cGPU,0,2*s*sizeof(int));
  
    mergePath<<<NB,NTPB>>>(cGPU,aGPU,s,bGPU,s);
