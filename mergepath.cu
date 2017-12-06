@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define NB 2
-#define NTPB 4 //Minimum number of threads in this program has to be 64
+#define NB 4
+#define NTPB 2 //Minimum number of threads in this program has to be 64
 #define sizeTab
 void testCUDA(cudaError_t error, const char *file, int line)  {
    if (error != cudaSuccess) {
@@ -13,9 +13,9 @@ void testCUDA(cudaError_t error, const char *file, int line)  {
 
 #define testCUDA(error) (testCUDA(error, __FILE__ , __LINE__))
 
-__device__ int Bd[NB*NTPB+1];
-__device__ int Ad[NB*NTPB+1];
 
+__device__ int Ad[NB*NTPB+1];
+__device__ int Bd[NB*NTPB+1];
 
 __device__ void printRange(int idx,int* t, int d,int f){
    
@@ -35,10 +35,11 @@ __device__ void printRange(int idx,int* t, int d,int f){
 __device__ void merge(int idx,int* C,int* A, int ab,int ad,int* B, int bb, int bd, int pos,int size){
    int start = ab+bb;
    int i = 0;
+   printf("->%d\n", ad-ab + bd-bb);
    while(1){
-      if(ab == ad && bb == bd){
+      if(ab >= ad && bb >= bd){
 
-         printRange(idx,C,0,16);
+        // printRange(idx,C,0,16);
          return;
       }else if(ab == ad){
          C[start+i] = B[bb];
@@ -60,14 +61,20 @@ __device__ void merge(int idx,int* C,int* A, int ab,int ad,int* B, int bb, int b
 
 
 __global__ void mergePath(int* C,int* A,int lenA,int *B,int lenB){
+   
    int idx = threadIdx.x + blockIdx.x * blockDim.x+1;
+   //C[idx-1] = idx;
    Ad[idx] = 0;
    Bd[idx] = 0;
-   if(idx == 0){
+   if(idx == 1){
+      // printf("\n");
       Ad[NB*NTPB] = lenA;
       Bd[NB*NTPB] = lenB;
+    
+   
    }
    
+
    int index = (idx*(lenA+lenB))/(NB*NTPB);
    int atop = (index > lenA)? lenA-1: index;
    int btop = (index > lenA)?  index - (lenA-1) : 0;
@@ -77,7 +84,7 @@ __global__ void mergePath(int* C,int* A,int lenA,int *B,int lenB){
    int ai;
    int bi;
    int flag = 0;
-   while(!flag){
+   while(!flag && idx != NB*NTPB){
       //printf("%d\n",i++ );
       offset = (int)floor(((float)(atop - abot))/(float)(2));
       ai = atop - offset;
@@ -103,8 +110,7 @@ __global__ void mergePath(int* C,int* A,int lenA,int *B,int lenB){
       }
    }
    __syncthreads();
-   if(idx == 1)
-   {
+      if(idx == 1){
       printRange(1,Ad,0,9);
       printRange(1,Bd,0,9);
    }
