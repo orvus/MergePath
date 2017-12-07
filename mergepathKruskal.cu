@@ -3,9 +3,9 @@
 #include <time.h>
 
 #define NB 1
-#define NTPB 1024
+#define NTPB 2
 
-#define SIZE 2048*512
+#define SIZE 16
 
 
 void testCUDA(cudaError_t error, const char *file, int line)  {
@@ -274,6 +274,7 @@ int comp (const void * elem1, const void * elem2)
     if (f < s_) return -1;
     return 0;
 }
+int np = 6;
 
 int main(int argc,char** argv){
 
@@ -287,7 +288,7 @@ void kruskal()
    int belongs[MAX],i,j,cno1,cno2;
    elist.n=0;
 
-   for(i=1;i<n;i++)
+   for(i=1;i<np;i++)
      for(j=0;j<i;j++)
      {
          if(G[i][j]!=0)
@@ -315,11 +316,11 @@ void kruskal()
    //création des variable sur le GPU
    edge *aGPU,*bGPU;
    testCUDA(cudaMalloc(&aGPU,SIZE*sizeof(edge)));
-   testCUDA(cudaMemcpy(aGPU,elist.data,SIZE*sizeof(edge),cudaMemcpyHostToDevice));
+   testCUDA(cudaMemcpy(aGPU,elist.data,MAX*sizeof(edge),cudaMemcpyHostToDevice));
    testCUDA(cudaMalloc(&bGPU,sizeof(elist.data)));
-   testCUDA(cudaMemcpy(bGPU,elist.data,SIZE*sizeof(edge),cudaMemcpyHostToDevice));
+   testCUDA(cudaMemcpy(bGPU,elist.data,MAX*sizeof(edge),cudaMemcpyHostToDevice));
    //---------------------------------
-   affiche(A,SIZE); // affichage du tableau non trié
+  // affiche(A,SIZE); // affichage du tableau non trié
    printf("len tab : %d\n",SIZE );
 
    // gestion du temps 
@@ -348,19 +349,20 @@ void kruskal()
 
 
    // récupération du talbeau sur le CPU
-   testCUDA(cudaMemcpy(ret,aGPU,SIZE*sizeof(edge),cudaMemcpyDeviceToHost));
+   testCUDA(cudaMemcpy(spanlist.data,aGPU,MAX*sizeof(edge),cudaMemcpyDeviceToHost));
    printf("\n\n");
-   affiche(ret,SIZE);
+   print();
+  // affiche(ret,SIZE);
    printf("GPU Timer for the addition on the GPU of vectors: %f ms\n", 
          TimerAddOne);
 
    // libération de la memoire
-   free(A);free(ret);
-   testCUDA(cudaFree(aGPU));
-   testCUDA(cudaFree(bGPU));
+   // free(A);free(ret);
+   // testCUDA(cudaFree(aGPU));
+   // testCUDA(cudaFree(bGPU));
 
 
-   for(i=0;i<n;i++)
+   for(i=0;i<np;i++)
      belongs[i]=i;
 
    spanlist.n=0;
@@ -388,7 +390,7 @@ void union1(int belongs[],int c1,int c2)
 {
     int i;
     
-    for(i=0;i<n;i++)
+    for(i=0;i<np;i++)
         if(belongs[i]==c2)
             belongs[i]=c1;
 }
