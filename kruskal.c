@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #define MAX 36
  
 typedef struct edge
@@ -38,8 +39,14 @@ int main()
     for(i=0;i<n;i++)
         for(j=0;j<n;j++)
             scanf("%d",&G[i][j]);
-     */       
+     */
+    clock_t start, end;
+    double duration;
+    start = clock();
     kruskal();
+    end = clock();
+    duration =  (double)(end - start) / CLOCKS_PER_SEC;
+    printf ("EXEC TIME = %f s\n", duration);
     print();
     return 0;
 }
