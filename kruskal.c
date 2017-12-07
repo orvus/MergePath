@@ -104,17 +104,17 @@ void sort(edgelist *elist)
 {
     int i,j;
     edge temp;
-    for(i=0;i<elist.n;i++){
-        printf("%d", elist.data[i].w);
+    for(i=0;i<elist->n;i++){
+        printf("%d", elist->data[i].w);
     }
-    for(i=1;i<elist.n;i++)
-        for(j=0;j<elist.n-1;j++)
-            if(elist.data[j].w>elist.data[j+1].w)
+    for(i=1;i<elist->n;i++)
+        for(j=0;j<elist->n-1;j++)
+            if(elist->data[j].w>elist->data[j+1].w)
             {
 
-                temp=elist.data[j];
-                elist.data[j]=elist.data[j+1];
-                elist.data[j+1]=temp;
+                temp=elist->data[j];
+                elist->data[j]=elist->data[j+1];
+                elist->data[j+1]=temp;
             }
 }
 
