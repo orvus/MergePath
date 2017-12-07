@@ -3,9 +3,9 @@
 #include <time.h>
 
 #define NB 1
-#define NTPB 2
+#define NTPB 1024
 
-#define SIZE 32
+#define SIZE 2048*512
 
 
 void testCUDA(cudaError_t error, const char *file, int line)  {
@@ -217,7 +217,7 @@ __global__ void sort(int *R,int* S,int lenR){
    idx = idx%((NB*NTPB)/turn);
    while(size <= lenR){
      //printf("%d,%d -> mergePath(R+%d,S+%d ,%d, S+%d, %d,%d);\n",idx,turn,idx*size,idx*size ,size/2,size/2+idx*size,size/2,1);
-      mergePath(R+idx*size, S+idx*size ,size/2, S+size/2+idx*size, size/2,1);
+      mergePath(R+idx*size, S+idx*size ,size/2, S+size/2+idx*size, size/2,turn);
       
       for(int i = 0; i < size ; i++){
          S[idx*size+i] = R[idx*size+i];
