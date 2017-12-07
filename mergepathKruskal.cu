@@ -32,7 +32,16 @@ typedef struct edgelist
  
 edgelist elist;
  
-int G[6][6] = {{0,3,1,6,0,0},{3,0,5,0,3,0},{1,5,0,5,6,4},{6,0,5,0,0,2},{0,3,6,0,0,6},{0,0,4,2,6,0}},n;
+//int G[6][6] = {{0,3,1,6,0,0},{3,0,5,0,3,0},{1,5,0,5,6,4},{6,0,5,0,0,2},{0,3,6,0,0,6},{0,0,4,2,6,0}},n;
+int G[4][4] = {{0,1,0,0},{1,1,1,3},{0,1,0,2},{0,3,2,0}},n;
+//int G[8][8] = {{0,3,1,6,0,0,0,0},
+              {3,0,5,0,3,0,3,0},
+              {1,5,0,5,6,4,6,0},
+              {6,0,5,0,0,2,0,2},
+              {0,3,6,0,0,6,0,6},
+              {0,0,4,2,6,0,6,0},
+              {0,3,6,0,0,6,0,0},
+              {0,0,4,2,6,0,0,0}},n;
 edgelist spanlist;
  
 void kruskal();
@@ -274,7 +283,7 @@ int comp (const void * elem1, const void * elem2)
     if (f < s_) return -1;
     return 0;
 }
-int np = 6;
+int np = 8;
 
 int main(int argc,char** argv){
 
@@ -351,7 +360,7 @@ void kruskal()
    // récupération du talbeau sur le CPU
    testCUDA(cudaMemcpy(spanlist.data,aGPU,MAX*sizeof(edge),cudaMemcpyDeviceToHost));
    printf("\n\n");
-   print();
+   //print();
   // affiche(ret,SIZE);
    printf("GPU Timer for the addition on the GPU of vectors: %f ms\n", 
          TimerAddOne);
