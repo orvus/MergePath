@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define MAX 6
+#define MAX 36
  
 typedef struct edge
 {
@@ -15,7 +15,7 @@ typedef struct edgelist
  
 edgelist elist;
  
-int G[MAX][MAX] = {{0,3,1,6,0,0},{3,0,5,0,3,0},{1,5,0,5,6,4},{6,0,5,0,0,2},{0,3,6,0,0,6},{0,0,4,2,6,0}},n;
+int G[6][6] = {{0,3,1,6,0,0},{3,0,5,0,3,0},{1,5,0,5,6,4},{6,0,5,0,0,2},{0,3,6,0,0,6},{0,0,4,2,6,0}},n;
 edgelist spanlist;
  
 void kruskal();
@@ -27,20 +27,18 @@ void print();
 int main()
 {
     int i,j,total_cost;
+    n=6;
     /*
     printf("\nEnter number of vertices:");
     
     scanf("%d",&n);
     
     printf("\nEnter the adjacency matrix:\n");
-    */
-    n = 6;
-    for(i=0;i<n;i++){
-        for(j=0;j<n;j++){
-            printf("%d, ",G[i][j]);
-        }
-        printf("\n");
-    }
+    
+    for(i=0;i<n;i++)
+        for(j=0;j<n;j++)
+            scanf("%d",&G[i][j]);
+     */       
     kruskal();
     print();
     return 0;
@@ -50,22 +48,20 @@ void kruskal()
 {
     int belongs[MAX],i,j,cno1,cno2;
     elist.n=0;
-    int o=0;
-    for(i=1;i<n;i++){
+ 
+    for(i=1;i<n;i++)
         for(j=0;j<i;j++)
         {
-            if(G[i][j] != 0)
+            if(G[i][j]!=0)
             {
                 elist.data[elist.n].u=i;
                 elist.data[elist.n].v=j;
-                elist.data[elist.n].w = G[i][j];
-                elist.n = ++o;
-                printf("%d/%d/%d\n",G[i][j],elist.data[elist.n-1].w,elist.n-1);
+                elist.data[elist.n].w=G[i][j];
+                elist.n++;
             }
         }
-    }
  
-    sort(elist);
+    sort();
     
     for(i=0;i<n;i++)
         belongs[i]=i;
@@ -100,25 +96,21 @@ void union1(int belongs[],int c1,int c2)
             belongs[i]=c1;
 }
  
-void sort(edgelist elist)
+void sort()
 {
     int i,j;
     edge temp;
-    for(i=0;i<elist.n;i++){
-        printf("%d", elist.data[i].w);
-    }
-    printf("\n");
-    for(i=0;i<elist.n;i++)
-        for(j=i;j<elist.n;j++)
+    
+    for(i=1;i<elist.n;i++)
+        for(j=0;j<elist.n-1;j++)
             if(elist.data[j].w>elist.data[j+1].w)
             {
-
                 temp=elist.data[j];
-                elist.data[j]=elist.data[i];
-                elist.data[i]=temp;
+                elist.data[j]=elist.data[j+1];
+                elist.data[j+1]=temp;
             }
 }
-
+ 
 void print()
 {
     int i,cost=0;
