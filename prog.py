@@ -1,8 +1,8 @@
 import random
 
-def mergePath(A,B):
+def mergePath(A,B,nbT):
     C = [0]*(len(A)+len(B))
-    nbT = 8
+    #nbT = 8
     Ad = [0]*(nbT+1)
     Bd = [0]*(nbT+1)
     
@@ -14,13 +14,13 @@ def mergePath(A,B):
         atop = len(A)-1 if (index > len(A)) else index
         btop = index - len(A)+1 if (index > len(A)) else 0
         abot = btop
-       # print "atop = ",atop,"btop=",btop,"abot = ",abot
+        #print "atop = ",atop,"btop=",btop,"abot = ",abot
         print("while num ",i)
         while 1 :
             offset = (atop - abot)/2
             ai = atop - offset
             bi = btop + offset 
-            if( i == 7):
+            if( i == 1):
                 print i,ai,bi,offset,atop,btop,abot
             if(bi == 0 or ai >= len(A) or  A[ai] > B[bi -1]):
                 if A[ai -1] <= B[bi]:
@@ -84,22 +84,9 @@ def otherMerge(A,ab,ad,B,bb,bd,C,pos,size):
             ab += 1
         i += 1
 
-size = 100
-        
-At = [0]*100
-Bt = [0]*(101)
-
-for i in range(1,size):
-    At[i] = random.randrange(At[i-1],At[i-1]+10)
-for i in range(1,80+20+1):
-    Bt[i] = random.randrange(Bt[i-1],Bt[i-1]+10)
-
-At = sorted(At)
-Bt = sorted(Bt)
-res = At + Bt
-res = sorted(res)
 A = [1,2,3,4,6,10,11,13]
 B = [5,7,8,9,12,14,15,16]
-
-mergePath(A,B )
+C = [2,9]
+D = [7,10]
+print mergePath(C,D,2 )
 
