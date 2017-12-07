@@ -283,7 +283,7 @@ int comp (const void * elem1, const void * elem2)
     if (f < s_) return -1;
     return 0;
 }
-int np = 8;
+int np = 4;
 
 int main(int argc,char** argv){
 
